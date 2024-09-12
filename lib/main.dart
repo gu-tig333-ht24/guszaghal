@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
 
 List<String> lst = [
   "Gym",
-  "Call a friend",
+  "Call a friend ",
   "Besikta bilen",
   "Learn more about flutter",
   "Create a database"
