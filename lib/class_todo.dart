@@ -1,46 +1,57 @@
 import 'package:flutter/material.dart';
 import './api.dart';
 
-class toDoList extends ChangeNotifier {
+class Todo {
   String title;
   String id;
-  bool check;
+  bool isChecked;
+
+  Todo({
+    required this.title,
+    required this.id,
+    this.isChecked = false,
+  });
+
+  factory Todo.fromJson(Map<String, dynamic> json) {
+    return Todo(
+      title: json['title'],
+      id: json['id'],
+      isChecked: json['done'],
+    );
+  }
+}
+
+class TodoListState extends ChangeNotifier {
   String filter = "";
-  List<toDoList> theList = [];
+  List<Todo> todoList = [];
 
-  toDoList({this.title = "", this.id = "", this.check = false});
-
-  void changeFilter(String newfilter) {
-    filter = newfilter;
+  void changeFilter(String newFilter) {
+    filter = newFilter;
     notifyListeners();
   }
 
-  List<toDoList> get getList {
+  List<Todo> get filteredList {
     if (filter == "Done") {
-      return theList.where((item) => item.check == true).toList();
+      return todoList.where((item) => item.isChecked).toList();
     } else if (filter == "Undone") {
-      return theList.where((item) => item.check == false).toList();
+      return todoList.where((item) => !item.isChecked).toList();
     }
-    return theList;
+    return todoList;
   }
 
-  void updateList(List<toDoList> newlist) {
-    theList = newlist;
+  void updateList(List<Todo> newList) {
+    todoList = newList;
     notifyListeners();
   }
 
   void deleteTodo(String id) async {
     await server_delete(id);
-    theList.removeWhere((item) => item.id == id);
+    todoList.removeWhere((item) => item.id == id);
     notifyListeners();
   }
 
-  void uppdateTodO(bool check, String id, String title) async {
-    await server_update(check, id, title);
+  void updateTodo(bool isChecked, String id, String title) async {
+    await server_update(isChecked, id, title);
     notifyListeners();
-  }
-
-  factory toDoList.fromJson(Map<String, dynamic> json) {
-    return toDoList(title: json['title'], id: json['id'], check: json['done']);
   }
 }
