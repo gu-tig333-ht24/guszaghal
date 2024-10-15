@@ -5,7 +5,7 @@ import './api.dart';
 import './class_todo.dart';
 
 void main() {
-  toDoList state = toDoList();
+  TodoListState state = TodoListState();
   runApp(ChangeNotifierProvider(
     create: (context) => state,
     child: MyApp(),
@@ -24,33 +24,33 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: toDo(),
+      home: TodoApp(),
     );
   }
 }
 
-class toDo extends StatefulWidget {
-  const toDo({super.key});
+class TodoApp extends StatefulWidget {
+  const TodoApp({super.key});
 
   @override
-  State<toDo> createState() => _toDoState();
+  State<TodoApp> createState() => _toDoState();
 }
 
-class _toDoState extends State<toDo> {
+class _toDoState extends State<TodoApp> {
   void initState() {
     super.initState();
     _loadTodosFromServer();
   }
 
   void _loadTodosFromServer() async {
-    final provid = Provider.of<toDoList>(context, listen: false);
-    List<toDoList> todosFromServer = await server_get();
+    final provid = Provider.of<TodoListState>(context, listen: false);
+    List<Todo> todosFromServer = await server_get();
     provid.updateList(todosFromServer);
   }
 
   @override
   Widget build(BuildContext context) {
-    final provid = Provider.of<toDoList>(context);
+    final provid = Provider.of<TodoListState>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -82,23 +82,23 @@ class _toDoState extends State<toDo> {
         children: [
           Expanded(
             child: ListView.builder(
-                itemCount: provid.getList.length,
+                itemCount: provid.filteredList.length,
                 itemBuilder: (context, index) {
-                  final item = provid.getList[index];
+                  final item = provid.filteredList[index];
                   return ListTile(
                     leading: Checkbox(
-                      value: item.check,
+                      value: item.isChecked,
                       onChanged: (bool? value) {
                         setState(() {
-                          provid.getList[index].check = value!;
-                          provid.uppdateTodO(value, item.id, item.title);
+                          provid.filteredList[index].isChecked = value!;
+                          provid.updateTodo(value, item.id, item.title);
                         });
                       },
                     ),
                     title: Text(
                       item.title,
                       style: TextStyle(
-                          decoration: item.check
+                          decoration: item.isChecked
                               ? TextDecoration.lineThrough
                               : TextDecoration.none),
                     ),
@@ -116,7 +116,7 @@ class _toDoState extends State<toDo> {
         backgroundColor: Colors.green.shade900,
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Add_toList()));
+              context, MaterialPageRoute(builder: (context) => AddToList()));
         },
         child: Icon(Icons.add, color: Colors.yellow.shade300),
       ),

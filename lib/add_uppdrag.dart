@@ -3,18 +3,18 @@ import 'package:provider/provider.dart';
 import './api.dart';
 import './class_todo.dart';
 
-class Add_toList extends StatefulWidget {
-  const Add_toList({super.key});
+class AddToList extends StatefulWidget {
+  const AddToList({super.key});
 
   @override
-  State<Add_toList> createState() => _Add_toListState();
+  State<AddToList> createState() => _Add_toListState();
 }
 
-class _Add_toListState extends State<Add_toList> {
+class _Add_toListState extends State<AddToList> {
   TextEditingController textEditingController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    final provid_2 = Provider.of<toDoList>(context);
+    final provid_2 = Provider.of<TodoListState>(context);
 
     return Scaffold(
         body: Stack(children: [
@@ -61,7 +61,7 @@ class _Add_toListState extends State<Add_toList> {
           ElevatedButton(
             onPressed: () async {
               await server_add(textEditingController.text);
-              List<toDoList> respone = await server_get();
+              List<Todo> respone = await server_get();
               provid_2.updateList(respone);
               Navigator.pop(context);
             },
