@@ -44,14 +44,26 @@ class TodoListState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteTodo(String id) async {
-    await server_delete(id);
-    todoList.removeWhere((item) => item.id == id);
-    notifyListeners();
+  Future<void> deleteTodo(String id) async {
+    try {
+      await server_delete(id);
+      todoList.removeWhere((item) => item.id == id);
+      notifyListeners();
+    } catch (ero) {
+      print("Fel vid remove av en todo: $ero");
+    }
   }
 
-  void updateTodo(bool isChecked, String id, String title) async {
-    await server_update(isChecked, id, title);
-    notifyListeners();
+  Future<bool> updateTodo(bool isChecked, String id, String title) async {
+    try {
+      bool success = await server_update(isChecked, id, title);
+      if (success) {
+        notifyListeners();
+      }
+      return success;
+    } catch (error) {
+      print("Fel vid uppdatea av en todo: $error");
+      return false;
+    }
   }
 }

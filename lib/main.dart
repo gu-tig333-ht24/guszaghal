@@ -43,9 +43,13 @@ class _toDoState extends State<TodoApp> {
   }
 
   void _loadTodosFromServer() async {
-    final provid = Provider.of<TodoListState>(context, listen: false);
-    List<Todo> todosFromServer = await server_get();
-    provid.updateList(todosFromServer);
+    try {
+      final provid = Provider.of<TodoListState>(context, listen: false);
+      List<Todo> todosFromServer = await server_get();
+      provid.updateList(todosFromServer);
+    } catch (error) {
+      print("Fel vid hämtningen todo-lista: $error");
+    }
   }
 
   @override
@@ -88,11 +92,17 @@ class _toDoState extends State<TodoApp> {
                   return ListTile(
                     leading: Checkbox(
                       value: item.isChecked,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          provid.filteredList[index].isChecked = value!;
-                          provid.updateTodo(value, item.id, item.title);
-                        });
+                      onChanged: (bool? value) async {
+                        bool success = await provid.updateTodo(
+                            value!, item.id, item.title);
+                        if (!success) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text("Misslyckadees att uppdatera ")));
+                        } else {
+                          setState(() {
+                            item.isChecked = value;
+                          });
+                        }
                       },
                     ),
                     title: Text(
@@ -103,8 +113,12 @@ class _toDoState extends State<TodoApp> {
                               : TextDecoration.none),
                     ),
                     trailing: IconButton(
-                        onPressed: () {
-                          provid.deleteTodo(item.id);
+                        onPressed: () async {
+                          try {
+                            await provid.deleteTodo(item.id);
+                          } catch (error) {
+                            print("Fel vid raderingen av en todo: $error");
+                          }
                         },
                         icon: Icon(Icons.cancel)),
                   );

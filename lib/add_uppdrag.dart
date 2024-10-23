@@ -60,10 +60,19 @@ class _Add_toListState extends State<AddToList> {
           ),
           ElevatedButton(
             onPressed: () async {
-              await server_add(textEditingController.text);
-              List<Todo> respone = await server_get();
-              provid_2.updateList(respone);
-              Navigator.pop(context);
+              try {
+                await server_add(textEditingController.text);
+                List<Todo> respone = await server_get();
+                provid_2.updateList(respone);
+                Navigator.pop(context);
+              } catch (error) {
+                print("Fel vid uppdraget lades till: $error");
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('fel vid addering av uppdraget'),
+                  ),
+                );
+              }
             },
             child: Row(
               mainAxisSize: MainAxisSize.min,
